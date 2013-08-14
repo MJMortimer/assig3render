@@ -7,6 +7,11 @@ public class Polygon {
 	private int r;
 	private int g;
 	private int b;
+	private boolean hidden;
+	private Vector3D vector1;
+	private Vector3D vector2;
+	private Vector3D vector3;
+	private Vector3D normal;
 
 	public Polygon(String line){
 		String[] values = line.split(" ");
@@ -30,9 +35,25 @@ public class Polygon {
 
 			this.b = Integer.parseInt(values[11]);
 
+			createVectors();
 		}catch(NumberFormatException e){
 			System.out.println(e);
 		}
+	}
+
+	private void createVectors() {
+		this.vector1 = new Vector3D(v2.getX() - v1.getX(),
+									v2.getY() - v1.getY(),
+									v2.getZ() - v1.getZ());
+
+		this.vector2 = new Vector3D(v3.getX() - v2.getX(),
+									v3.getY() - v2.getY(),
+									v3.getZ() - v2.getZ());
+
+		this.vector3 = new Vector3D(v1.getX() - v3.getX(),
+									v1.getY() - v3.getY(),
+									v1.getZ() - v3.getZ());
+
 	}
 
 	public Vertex getV1(){
@@ -46,5 +67,20 @@ public class Polygon {
 	public Vertex getV3(){
 		return v3;
 	}
+
+	public void setHidden(boolean h){
+		this.hidden = h;
+	}
+
+	public boolean isHidden(){
+		return this.hidden;
+	}
+
+	public void computeNormal(){
+		this.normal = vector1.crossProduct(vector2);
+
+	}
+
+
 
 }
