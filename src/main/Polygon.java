@@ -4,14 +4,17 @@ public class Polygon {
 	private Vertex v1;
 	private Vertex v2;
 	private Vertex v3;
-	private int r;
-	private int g;
-	private int b;
+	private int rReflect;
+	private int gReflect;
+	private int bReflect;
+	private float rShade;
+	private float gShade;
+	private float bShade;
 	private boolean hidden;
 	private Vector3D vector1;
 	private Vector3D vector2;
 	private Vector3D vector3;
-	private Vector3D normal;
+	private Vector3D unitNormal;
 
 	public Polygon(String line){
 		String[] values = line.split(" ");
@@ -29,13 +32,14 @@ public class Polygon {
 					Float.parseFloat(values[7]), 
 					Float.parseFloat(values[8]));
 
-			this.r = Integer.parseInt(values[9]);
+			this.rReflect = Integer.parseInt(values[9]);
 
-			this.g = Integer.parseInt(values[10]);
+			this.gReflect = Integer.parseInt(values[10]);
 
-			this.b = Integer.parseInt(values[11]);
+			this.bReflect = Integer.parseInt(values[11]);
 
-			createVectors();
+			//createVectors();
+			//computeNormal();
 		}catch(NumberFormatException e){
 			System.out.println(e);
 		}
@@ -76,9 +80,24 @@ public class Polygon {
 		return this.hidden;
 	}
 
-	public void computeNormal(){
-		this.normal = vector1.crossProduct(vector2);
+	public void computeUnitNormal(){
+		Vector3D normal = vector1.crossProduct(vector2);
+		this.unitNormal = new Vector3D(normal.x/normal.mag ,normal.y/normal.mag, normal.z/normal.mag);
+	}
+	
+	public Vector3D getUnitNormal(){
+		return this.unitNormal;
+	}
 
+	public void computeShading(Vector3D lightSource, float ambience) {
+		createVectors();
+		computeUnitNormal();
+		float intensity = 1.0f;
+		
+		float costh = unitNormal.dotProduct(lightSource);
+		this.rShade = ( ( (ambience + intensity) * costh) * rReflect);
+		this.gShade = ( ( (ambience + intensity) * costh) * gReflect);
+		this.bShade = ( ( (ambience + intensity) * costh) * bReflect);
 	}
 
 
