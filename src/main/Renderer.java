@@ -1,11 +1,15 @@
 package main;
 
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import javax.imageio.ImageIO;
 
 public class Renderer {
 	private List<Polygon> polygons;
@@ -14,7 +18,8 @@ public class Renderer {
 	private float lon;
 	private float ambience;
 	private Rectangle2D.Float bounds;
-	private ZBufferCell[][] image;
+	private ZBufferCell[][] zBuffer;
+	private BufferedImage image;
 
 	public Renderer(String[] args){
 		if(args.length != 4) throw new IllegalArgumentException("Incorrect Number of Arguments");
@@ -39,25 +44,53 @@ public class Renderer {
 
 		/**
 		//TODO ROTATE THE POLYGONS AND LIGHT SOURCE
-		*/
+		 */
 		computeBoundingBox();
 		/**
 		//TODO SCALE AND TRANSLATE TO FIT. Compute box again
-		*/
-		
-		computePolygonShading();
-		
-		//TODO change literals
-		image = new ZBufferCell[800][800];
-		
+		 */
 
+		computePolygonShading();
+
+
+
+		initZBuffer();
+		convertToImage();
+		saveImage("tester");
+
+	}
+
+	private void initZBuffer() {
+		//TODO change literals
+		zBuffer = new ZBufferCell[800][800];
+		for(int i=0; i<zBuffer.length; i++){
+			for(int j = 0; j < zBuffer[i].length; j++){
+				zBuffer[i][j] = new ZBufferCell();
+
+			}
+		}
+
+	}
+
+	private void convertToImage(){
+		image  = new BufferedImage(zBuffer.length, zBuffer[0].length, BufferedImage.TYPE_INT_RGB);
+		for (int x = 0; x < zBuffer.length; x++) {
+			for (int y = 0; y < zBuffer[0].length; y++) {
+				image.setRGB(x, y, zBuffer[x][y].getColor().getRGB());
+			}
+		}
+	}
+
+	private void saveImage(String fname){
+		try {ImageIO.write(image, "png", new File(fname));}
+		catch(IOException e){System.out.println("Image saving failed: "+e);}
 	}
 
 	private void computePolygonShading() {
 		for(Polygon p : polygons){
 			p.computeShading(lightSource, ambience);
 		}
-		
+
 	}
 
 	public void parseArgs(String[] args){
@@ -121,7 +154,7 @@ public class Renderer {
 		}
 		bounds = new Rectangle2D.Float(minX, minY, maxX-minX, maxY-minY);
 	}
-	
+
 	public static void main(String[] args){
 		Renderer r = new Renderer(args);
 	}

@@ -1,5 +1,7 @@
 package main;
 
+import java.awt.Color;
+
 public class ZBufferCell {
 		private float rShade;
 		private float gShade;
@@ -14,9 +16,13 @@ public class ZBufferCell {
 		}
 		
 		public ZBufferCell(){
-			this.rShade = 0.0f;
-			this.gShade = 0.0f;
-			this.bShade = 0.0f;
+			this.rShade = 1.0f;
+			this.gShade = 1.0f;
+			this.bShade = 1.0f;
 			this.zDepth = Float.POSITIVE_INFINITY;
+		}
+		
+		public Color getColor(){
+			return new Color(rShade, gShade, bShade);
 		}
 }
